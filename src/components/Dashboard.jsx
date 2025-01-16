@@ -74,6 +74,33 @@ const Dashboard = () => {
     setEditingService(service);
   };
 
+  const handleDelete = async (serviceId) => {
+    if (window.confirm("¿Estás seguro de que deseas eliminar este servicio?")) {
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+          console.error('No se encontró el token de autenticación');
+          return;
+        }
+  
+        await axios.delete(`http://181.199.159.26:8080/api/servicios/${serviceId}/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        // Actualizar la lista de servicios después de eliminar
+        setServices((prevServices) =>
+          prevServices.filter((service) => service.id !== serviceId)
+        );
+        alert("Servicio eliminado con éxito.");
+      } catch (error) {
+        console.error('Error al eliminar el servicio:', error);
+        alert("Ocurrió un error al intentar eliminar el servicio.");
+      }
+    }
+  };
+
   const handleRequest = (serviceId) => {
     // Aquí iría la lógica para solicitar un servicio.
     console.log(`Solicitando servicio con ID: ${serviceId}`);
@@ -89,6 +116,7 @@ const Dashboard = () => {
         >
           Logout
         </button>
+
         <button
           onClick={handleProfile}
           className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
@@ -133,7 +161,7 @@ const Dashboard = () => {
                       Actualizar
                     </button>
                     <button
-                      onClick={() => console.log(`Borrar servicio con ID: ${service.id}`)}
+                      onClick={() => handleDelete(service.id)}
                       className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded"
                     >
                       Borrar
