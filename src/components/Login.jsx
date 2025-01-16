@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -11,13 +12,23 @@ const Login = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const navigate = useNavigate(); // Hook para redirigir
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
     try {
       const response = await axios.post('http://192.168.100.52:8000/api/auth/login/', formData);
+      const { access, refresh } = response.data;
+      localStorage.setItem('accessToken', access);
+      localStorage.setItem('refreshToken', refresh);
+      
       console.log(response.data);
+
+      // Redirigir al dashboard si el login es exitoso
+      navigate('/dashboard');
     } catch (error) {
-      console.error(error);
+      console.error('Error al iniciar sesión:', error);
     }
   };
 
