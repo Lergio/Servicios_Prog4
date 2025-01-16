@@ -7,20 +7,28 @@ const Login = () => {
     username: '',
     password: ''
   });
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const navigate = useNavigate(); // Hook para redirigir
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
     try {
-      const response = await axios.post('http://181.199.159.26:8000/api/auth/login/', formData);
+      const response = await axios.post('http://192.168.100.52:8000/api/auth/login/', formData);
+      const { access, refresh } = response.data;
+      localStorage.setItem('accessToken', access);
+      localStorage.setItem('refreshToken', refresh);
+      
       console.log(response.data);
-      navigate('/profile');
+
+      // Redirigir al dashboard si el login es exitoso
+      navigate('/dashboard');
     } catch (error) {
-      console.error(error);
+      console.error('Error al iniciar sesión:', error);
     }
   };
 

@@ -3,22 +3,29 @@ import axios from 'axios';
 
 const Dashboard = () => {
   const [services, setServices] = useState([]);
-  const [requests, setRequests] = useState([]);
-  const [ratings, setRatings] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const servicesResponse = await axios.get('/api/servicios');
-        setServices(servicesResponse.data);
+        // Obtén el token del localStorage
+        const token = localStorage.getItem('accessToken');
 
-        const requestsResponse = await axios.get('/api/solicitudes');
-        setRequests(requestsResponse.data);
+        if (!token) {
+          console.error('No se encontró el token de autenticación');
+          return;
+        }
 
-        const ratingsResponse = await axios.get('/api/calificaciones');
-        setRatings(ratingsResponse.data);
+        // Realiza la solicitud GET con el token en los headers
+        const response = await axios.get('http://192.168.100.52:8000/api/servicios', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Actualiza el estado con los datos obtenidos
+        setServices(response.data);
       } catch (error) {
-        console.error(error);
+        console.error('Error al obtener los servicios:', error);
       }
     };
 
@@ -30,26 +37,14 @@ const Dashboard = () => {
       <h1 className="text-3xl font-bold mb-8 text-center">Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <section className="bg-white p-6 rounded shadow-md">
-          <h2 className="text-2xl font-bold mb-4">Services</h2>
+          <h2 className="text-2xl font-bold mb-4">Últimos Servicios</h2>
           <ul className="space-y-2">
-            {services.map(service => (
-              <li key={service.id} className="border-b pb-2">{service.titulo}</li>
-            ))}
-          </ul>
-        </section>
-        <section className="bg-white p-6 rounded shadow-md">
-          <h2 className="text-2xl font-bold mb-4">Requests</h2>
-          <ul className="space-y-2">
-            {requests.map(request => (
-              <li key={request.id} className="border-b pb-2">{request.comentario}</li>
-            ))}
-          </ul>
-        </section>
-        <section className="bg-white p-6 rounded shadow-md">
-          <h2 className="text-2xl font-bold mb-4">Ratings</h2>
-          <ul className="space-y-2">
-            {ratings.map(rating => (
-              <li key={rating.id} className="border-b pb-2">{rating.comentario}</li>
+            {services.map((service) => (
+              <li key={service.id} className="border-b pb-2">
+                <h3 className="font-semibold">{service.titulo}</h3>
+                <p>{service.descripcion}</p>
+                <span className="text-sm text-gray-500">{service.categoria}</span>
+              </li>
             ))}
           </ul>
         </section>
