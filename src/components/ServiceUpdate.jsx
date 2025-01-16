@@ -8,6 +8,7 @@ const ServiceUpdate = ({ serviceId, onClose, onServiceUpdated }) => {
     categoria: '',
     duracion_estimada: '',
     disponibilidad_horaria: '',
+    id_oferente: null,
   });
 
   useEffect(() => {
@@ -34,6 +35,7 @@ const ServiceUpdate = ({ serviceId, onClose, onServiceUpdated }) => {
           categoria: response.data.categoria,
           duracion_estimada: response.data.duracion_estimada,
           disponibilidad_horaria: response.data.disponibilidad_horaria,
+          id_oferente: response.data.id_oferente, // Incluimos id_oferente
         });
       } catch (error) {
         console.error('Error al cargar el servicio:', error);
@@ -57,9 +59,19 @@ const ServiceUpdate = ({ serviceId, onClose, onServiceUpdated }) => {
         return;
       }
 
-      const response = await axios.put(
+      // Filtramos solo los campos necesarios para la solicitud PATCH
+      const patchData = {
+        titulo: formData.titulo,
+        descripcion: formData.descripcion,
+        categoria: formData.categoria,
+        duracion_estimada: formData.duracion_estimada,
+        disponibilidad_horaria: formData.disponibilidad_horaria,
+        id_oferente: formData.id_oferente,
+      };
+
+      const response = await axios.patch(
         `http://181.199.159.26:8080/api/servicios/${serviceId}/`,
-        formData,
+        patchData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
