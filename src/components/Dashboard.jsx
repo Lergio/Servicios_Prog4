@@ -51,6 +51,11 @@ const Dashboard = () => {
     navigate('/login');
   };
 
+
+  const handleProfile = () => {
+    navigate('/profile');
+  }
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Navbar */}
@@ -61,6 +66,12 @@ const Dashboard = () => {
           className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
         >
           Logout
+        </button>
+        <button
+          onClick={handleProfile}
+          className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
+        >
+          Profile
         </button>
       </nav>
 

@@ -4,10 +4,11 @@ import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    username: '',
+    username: '' ,
     email: '',
-    password: ''
-    //rol: ''
+    first_name: '',
+    last_name: '',
+    password:''
   });
 
   const navigate = useNavigate();
@@ -35,6 +36,8 @@ const Register = () => {
           <input type="text" name="username" placeholder="Name" onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
           <input type="email" name="email" placeholder="Email" onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
           <input type="password" name="password" placeholder="Password" onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
+          <input type="text" name="first_name" placeholder="First_name" onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
+          <input type="text" name="last_name" placeholder="Last_name" onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
           {/* <select name="rol" onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded">
             <option value="">Select Role</option>
             <option value="role1">Provider</option>
