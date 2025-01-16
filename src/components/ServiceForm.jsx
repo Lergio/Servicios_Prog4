@@ -1,49 +1,128 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const ServiceForm = ({ service, onSubmit }) => {
-  const [formData, setFormData] = useState(service || {
+const ServiceForm = ({ onServiceAdded }) => {
+  const [formData, setFormData] = useState({
     titulo: '',
     descripcion: '',
     categoria: '',
     duracion_estimada: '',
     disponibilidad_horaria: '',
-    id_oferente: ''
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+  const user = JSON.parse(localStorage.getItem('user'));
+  const userid = user.id;
     try {
-      const response = await axios.post('/api/servicios', formData);
-      onSubmit(response.data);
+      const token = localStorage.getItem('accessToken');
+      console.log(token)
+      const id_oferente = userid; // Supongamos que lo guardas al iniciar sesión.
+      console.log(id_oferente)
+
+      if (!token || !id_oferente) {
+        console.error('Token o ID del oferente no disponible');
+        return;
+      }
+
+      const response = await axios.post(
+        'http://181.199.159.26:8080/api/servicios/',
+        { ...formData, id_oferente },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      onServiceAdded(response.data);
     } catch (error) {
-      console.error(error);
+      console.error('Error al agregar el servicio:', error);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Create Service</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input type="text" name="titulo" placeholder="Title" onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
-          <textarea name="descripcion" placeholder="Description" onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded"></textarea>
-          <select name="categoria" onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded">
-            <option value="">Select Category</option>
-            <option value="category1">Category 1</option>
-            <option value="category2">Category 2</option>
-            {/* Add more categories as needed */}
-          </select>
-          <input type="text" name="duracion_estimada" placeholder="Estimated Duration" onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
-          <input type="text" name="disponibilidad_horaria" placeholder="Availability" onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
-          <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Submit</button>
-        </form>
+    <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md mb-8">
+      <h2 className="text-2xl font-bold mb-4">Ofrecer Servicio</h2>
+      <div className="mb-4">
+        <label className="block mb-2 font-semibold">Título</label>
+        <input
+          type="text"
+          name="titulo"
+          value={formData.titulo}
+          onChange={handleChange}
+          required
+          maxLength="255"
+          className="w-full p-2 border rounded"
+        />
       </div>
-    </div>
+      <div className="mb-4">
+        <label className="block mb-2 font-semibold">Descripción</label>
+        <textarea
+          name="descripcion"
+          value={formData.descripcion}
+          onChange={handleChange}
+          required
+          className="w-full p-2 border rounded"
+        />
+      </div>
+      <div className="mb-4">
+        <label className="block mb-2 font-semibold">Categoría</label>
+        <select
+          name="categoria"
+          value={formData.categoria}
+          onChange={handleChange}
+          required
+          className="w-full p-2 border rounded"
+        >
+          <option value="">Selecciona una categoría</option>
+          <option value="tecnologia">Tecnología</option>
+          <option value="gastronomia">Gastronomía</option>
+          <option value="mantenimiento">Mantenimiento</option>
+          <option value="salud">Salud</option>
+          <option value="maestranza">Maestranza</option>
+          <option value="ocio">Ocio</option>
+          <option value="gerontologia">Gerontología</option>
+          <option value="venta">Venta</option>
+        </select>
+      </div>
+      <div className="mb-4">
+        <label className="block mb-2 font-semibold">Duración Estimada</label>
+        <input
+          type="text"
+          name="duracion_estimada"
+          value={formData.duracion_estimada}
+          onChange={handleChange}
+          required
+          maxLength="50"
+          className="w-full p-2 border rounded"
+        />
+      </div>
+      <div className="mb-4">
+        <label className="block mb-2 font-semibold">Disponibilidad Horaria</label>
+        <input
+          type="text"
+          name="disponibilidad_horaria"
+          value={formData.disponibilidad_horaria}
+          onChange={handleChange}
+          required
+          maxLength="255"
+          className="w-full p-2 border rounded"
+        />
+      </div>
+      <button
+        type="submit"
+        className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+      >
+        Guardar Servicio
+      </button>
+    </form>
   );
 };
 
