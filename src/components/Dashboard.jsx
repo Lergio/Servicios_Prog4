@@ -45,13 +45,17 @@ const Dashboard = () => {
     fetchData();
   }, [navigate]);
 
+  const handleProfile = () => {
+    navigate('/profile');
+  }
+
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
     navigate('/login');
   };
-  
+
   const handleServiceAdded = (newService) => {
     setServices((prevServices) => [newService, ...prevServices]);
     setShowForm(false);

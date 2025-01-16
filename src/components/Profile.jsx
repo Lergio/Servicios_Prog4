@@ -5,9 +5,12 @@ import { useNavigate } from 'react-router-dom';
 const Profile = () => {
   const [user, setUser] = useState(null);
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    rol: ''
+    username:'',
+    email:'',
+    first_name:'',
+    last_name:'',
+    password:'',
+    rol:''
   });
   const navigate = useNavigate();
 
@@ -95,8 +98,11 @@ const Profile = () => {
         <h2 className="text-2xl font-bold mb-6 text-center">Profile</h2>
         <p className="text-center mb-6">Welcome, {user.rol}</p>
         <form className="space-y-4">
-          <input type="text" name="nombre" placeholder="Name" value={formData.nombre} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
+          <input type="text" name="username" placeholder="Name" value={formData.nombre} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
           <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
+          <input type="text" name="first_name" placeholder="First_name" value={formData.email} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
+          <input type="text" name="last_name" placeholder="Last_name" value={formData.email} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
+          <input type="password" name="password" placeholder="Password" value={formData.email} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
           <select name="rol" value={user.rol} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded">
             <option value="">Select Role</option>
             <option value="role1">Provider</option>
