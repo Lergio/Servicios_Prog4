@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const ServiceUpdate = ({ serviceId, onClose, onServiceUpdated }) => {
+const ServiceDelete = ({ serviceId, onClose, onServiceDeleted }) => {
   const [formData, setFormData] = useState({
     titulo: '',
     descripcion: '',
@@ -35,7 +35,7 @@ const ServiceUpdate = ({ serviceId, onClose, onServiceUpdated }) => {
           categoria: response.data.categoria,
           duracion_estimada: response.data.duracion_estimada,
           disponibilidad_horaria: response.data.disponibilidad_horaria,
-          id_oferente: response.data.id_oferente, // Incluimos id_oferente
+          id_oferente: response.data.id_oferente,
         });
       } catch (error) {
         console.error('Error al cargar el servicio:', error);
@@ -45,13 +45,7 @@ const ServiceUpdate = ({ serviceId, onClose, onServiceUpdated }) => {
     fetchService();
   }, [serviceId]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleDelete = async () => {
     try {
       const token = localStorage.getItem('accessToken');
       if (!token) {
@@ -59,101 +53,68 @@ const ServiceUpdate = ({ serviceId, onClose, onServiceUpdated }) => {
         return;
       }
 
-      // Filtramos solo los campos necesarios para la solicitud PATCH
-      const patchData = {
-        titulo: formData.titulo,
-        descripcion: formData.descripcion,
-        categoria: formData.categoria,
-        duracion_estimada: formData.duracion_estimada,
-        disponibilidad_horaria: formData.disponibilidad_horaria,
-        id_oferente: formData.id_oferente,
-      };
+      await axios.delete(`http://181.199.159.26:8080/api/servicios/${serviceId}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-      const response = await axios.patch(
-        `http://181.199.159.26:8080/api/servicios/${serviceId}/`,
-        patchData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      onServiceUpdated(response.data); // Notificar que el servicio ha sido actualizado
+      onServiceDeleted(); // Notificar que el servicio ha sido eliminado
       onClose(); // Cerrar la ventana
     } catch (error) {
-      console.error('Error al actualizar el servicio:', error);
+      console.error('Error al eliminar el servicio:', error);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md mb-8">
-      <h2 className="text-2xl font-bold mb-4">Actualizar Servicio</h2>
+    <div className="bg-white p-6 rounded shadow-md mb-8">
+      <h2 className="text-2xl font-bold mb-4">Eliminar Servicio</h2>
       <div className="mb-4">
         <label className="block mb-2 font-semibold">Título</label>
         <input
           type="text"
-          name="titulo"
           value={formData.titulo}
-          onChange={handleChange}
-          required
-          maxLength="255"
-          className="w-full p-2 border rounded"
+          disabled
+          className="w-full p-2 border rounded bg-gray-100"
         />
       </div>
       <div className="mb-4">
         <label className="block mb-2 font-semibold">Descripción</label>
         <textarea
-          name="descripcion"
           value={formData.descripcion}
-          onChange={handleChange}
-          required
-          className="w-full p-2 border rounded"
+          disabled
+          className="w-full p-2 border rounded bg-gray-100"
         />
       </div>
       <div className="mb-4">
         <label className="block mb-2 font-semibold">Categoría</label>
-        <select
-          name="categoria"
+        <input
+          type="text"
           value={formData.categoria}
-          onChange={handleChange}
-          required
-          className="w-full p-2 border rounded"
-        >
-          <option value="">Selecciona una categoría</option>
-          <option value="tecnologia">Tecnología</option>
-          <option value="gastronomia">Gastronomía</option>
-          <option value="mantenimiento">Mantenimiento</option>
-          <option value="salud">Salud</option>
-          <option value="maestranza">Maestranza</option>
-          <option value="ocio">Ocio</option>
-          <option value="gerontologia">Gerontología</option>
-          <option value="venta">Venta</option>
-        </select>
+          disabled
+          className="w-full p-2 border rounded bg-gray-100"
+        />
       </div>
       <div className="mb-4">
         <label className="block mb-2 font-semibold">Duración Estimada</label>
         <input
           type="text"
-          name="duracion_estimada"
           value={formData.duracion_estimada}
-          onChange={handleChange}
-          required
-          maxLength="50"
-          className="w-full p-2 border rounded"
+          disabled
+          className="w-full p-2 border rounded bg-gray-100"
         />
       </div>
       <div className="mb-4">
         <label className="block mb-2 font-semibold">Disponibilidad Horaria</label>
         <input
           type="text"
-          name="disponibilidad_horaria"
           value={formData.disponibilidad_horaria}
-          onChange={handleChange}
-          required
-          maxLength="255"
-          className="w-full p-2 border rounded"
+          disabled
+          className="w-full p-2 border rounded bg-gray-100"
         />
+      </div>
+      <div className="mb-6 text-center font-semibold text-red-500">
+        ¿Desea borrar este servicio?
       </div>
       <div className="flex justify-end space-x-4">
         <button
@@ -164,14 +125,15 @@ const ServiceUpdate = ({ serviceId, onClose, onServiceUpdated }) => {
           Cancelar
         </button>
         <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+          type="button"
+          onClick={handleDelete}
+          className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
         >
-          Guardar Cambios
+          Confirmar
         </button>
       </div>
-    </form>
+    </div>
   );
 };
 
-export default ServiceUpdate;
+export default ServiceDelete;
