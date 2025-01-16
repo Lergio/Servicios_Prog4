@@ -7,6 +7,7 @@ import RequestForm from './components/RequestForm';
 import RatingForm from './components/RatingForm';
 import Dashboard from './components/Dashboard';
 import Home from './components/Home';
+import Profile from './components/Profile';
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
           <Route path="/requests/new" element={<RequestForm />} />
           <Route path="/ratings/new" element={<RatingForm />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </div>
     </Router>
