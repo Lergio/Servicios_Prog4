@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
-  const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [formData, setFormData] = useState({
     username:'',
     email:'',
@@ -34,10 +34,10 @@ const Profile = () => {
         });
 
         // Update the state with the data obtained
-        setUser(response.data);
+        setProfile(response.data);
         setFormData(response.data);
       } catch (error) {
-        console.error('Error getting user data:', error);
+        console.error('Error getting profile data:', error);
 
         // If the token is invalid or expired, redirect to the login
         if (error.response && error.response.status === 401) {
@@ -59,12 +59,12 @@ const Profile = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await axios.put('http://192.168.100.52:8000/api/user', formData, {
+      const response = await axios.patch('http://181.199.159.26:8080/api/auth/profile/', formData, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-      setUser(response.data);
+      setProfile(response.data);
       alert('Profile updated successfully');
     } catch (error) {
       console.error(error);
@@ -74,7 +74,7 @@ const Profile = () => {
   const handleDelete = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      await axios.delete('http://192.168.100.52:8000/api/user', {
+      await axios.delete('http://181.199.159.26:8080/api/auth/profile/', {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -88,7 +88,7 @@ const Profile = () => {
     }
   };
 
-  if (!user) {
+  if (!profile) {
     return <div>Loading...</div>;
   }
 
@@ -96,18 +96,17 @@ const Profile = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Profile</h2>
-        <p className="text-center mb-6">Welcome, {user.rol}</p>
+        <p className="text-center mb-6">Welcome, {profile.username}</p>
         <form className="space-y-4">
-          <input type="text" name="username" placeholder="Name" value={formData.nombre} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
+          <input type="text" name="username" placeholder="Username" value={formData.username} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
           <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
-          <input type="text" name="first_name" placeholder="First_name" value={formData.email} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
-          <input type="text" name="last_name" placeholder="Last_name" value={formData.email} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
-          <input type="password" name="password" placeholder="Password" value={formData.email} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
-          <select name="rol" value={user.rol} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded">
-            <option value="">Select Role</option>
-            <option value="role1">Provider</option>
-            <option value="role2">Seeker</option>
-            <option value="role3">Both</option>
+          <input type="text" name="first_name" placeholder="First Name" value={formData.first_name} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
+          <input type="text" name="last_name" placeholder="Last Name" value={formData.last_name} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
+          <select name="rol" value={formData.rol} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded">
+            <option value="">Seleccionar Rol</option>
+            <option value="role1">Oferente</option>
+            <option value="role2">Buscador</option>
+            <option value="role3">Ambos</option>
           </select>
           <button type="button" onClick={handleUpdate} className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Update</button>
           <button type="button" onClick={handleDelete} className="w-full bg-red-500 text-white p-2 rounded hover:bg-red-600">Delete Account</button>

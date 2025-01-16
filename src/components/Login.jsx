@@ -18,7 +18,7 @@ const Login = () => {
     e.preventDefault();
   
     try {
-      const response = await axios.post('http://192.168.100.52:8080/api/auth/login/', formData);
+      const response = await axios.post('http://181.199.159.26:8080/api/auth/login/', formData);
       const { access, refresh } = response.data;
       localStorage.setItem('accessToken', access);
       localStorage.setItem('refreshToken', refresh);
