@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const ServiceForm = ({ onServiceAdded }) => {
+const ServiceForm = ({ onServiceAdded, onClose }) => {
   const [formData, setFormData] = useState({
     titulo: '',
     descripcion: '',
@@ -18,13 +18,11 @@ const ServiceForm = ({ onServiceAdded }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-  const user = JSON.parse(localStorage.getItem('user'));
-  const userid = user.id;
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userid = user.id;
     try {
       const token = localStorage.getItem('accessToken');
-      console.log(token)
       const id_oferente = userid; // Supongamos que lo guardas al iniciar sesión.
-      console.log(id_oferente)
 
       if (!token || !id_oferente) {
         console.error('Token o ID del oferente no disponible');
@@ -42,9 +40,23 @@ const ServiceForm = ({ onServiceAdded }) => {
       );
 
       onServiceAdded(response.data);
+      onClose(); // Cerrar el formulario después de agregar el servicio
     } catch (error) {
       console.error('Error al agregar el servicio:', error);
     }
+  };
+
+  const handleCancel = () => {
+    // Si necesitas hacer algo adicional antes de cerrar el formulario, lo puedes hacer aquí
+    setFormData({
+      titulo: '',
+      descripcion: '',
+      categoria: '',
+      duracion_estimada: '',
+      disponibilidad_horaria: '',
+    });
+
+    onClose();
   };
 
   return (
@@ -116,12 +128,21 @@ const ServiceForm = ({ onServiceAdded }) => {
           className="w-full p-2 border rounded"
         />
       </div>
-      <button
-        type="submit"
-        className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
-      >
-        Guardar Servicio
-      </button>
+      <div className="flex justify-end space-x-4">
+        <button
+          type="button"
+          onClick={handleCancel}
+          className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+        >
+          Guardar Servicio
+        </button>
+      </div>
     </form>
   );
 };
