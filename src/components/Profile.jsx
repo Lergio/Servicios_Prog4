@@ -108,13 +108,33 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Perfil {profile.username}</h2>
+    <div className="min-h-screen flex flex-col items-center bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+      {/* Navbar */}
+      <nav className="bg-white text-gray-800 p-4 w-full flex justify-between items-center shadow-md">
+        <h1 className="text-2xl font-bold">Perfil</h1>
+        <div className="flex space-x-4">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded transition duration-200"
+          >
+            Dashboard
+          </button>
+          <button
+            onClick={() => navigate('/login')}
+            className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded transition duration-200"
+          >
+            Salir
+          </button>
+        </div>
+      </nav>
+
+      {/* Contenido del perfil */}
+      <div className="bg-white p-8 rounded shadow-md w-full max-w-md mt-8">
+        <h2 className="text-2xl font-bold mb-6 text-center">Perfil de {profile.username}</h2>
         {isDeleting ? (
           <div className="text-center mb-6">
             <p>¿Estás seguro de que quieres eliminar tu cuenta?</p>
-            <button onClick={handleDelete} className="bg-red-500 text-white p-2 rounded hover:bg-red-600 mr-2">Yes</button>
+            <button onClick={handleDelete} className="bg-red-500 text-white p-2 rounded hover:bg-red-600 mr-2">Sí</button>
             <button onClick={handleDeleteCancel} className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600">No</button>
           </div>
         ) : (
@@ -127,8 +147,9 @@ const Profile = () => {
                 <input type="text" name="last_name" placeholder="Apellido" value={formData.last_name} onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
                 <input type="hidden" name="rol" value={formData.rol} onChange={handleChange} placeholder='Role' required className="w-full p-2 border border-gray-300 rounded"/>
                 <div className="flex justify-between">
-                  <button type="button" onClick={handleUpdate} className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Update</button>
-                  <button type="button" onClick={handleCancel} className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600">Cancel</button>
+
+                  <button type="button" onClick={handleUpdate} className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Actualizar</button>
+                  <button type="button" onClick={handleCancel} className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600">Cancelar</button>
                 </div>
               </form>
             ) : (
@@ -139,12 +160,12 @@ const Profile = () => {
                 <p><strong>Apellido:</strong> {profile.last_name}</p>
                 <p hidden><strong>Role:</strong> {profile.rol}</p>
                 <div className="flex justify-between">
-                  <button onClick={handleEdit} className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600">Edit</button>
-                  <button onClick={handleDeleteConfirmation} className="bg-red-500 text-white p-2 rounded hover:bg-red-600">Delete Account</button>
+                  <button onClick={handleEdit} className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600">Editar</button>
+                  <button onClick={handleDeleteConfirmation} className="bg-red-500 text-white p-2 rounded hover:bg-red-600">Eliminar Cuenta</button>
                 </div>
               </div>
             )}
-            <button onClick={() => navigate('/dashboard')} className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600 mt-4">Go to Dashboard</button>
+            <button onClick={() => navigate('/dashboard')} className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600 mt-4">Ir a Panel Principal</button>
           </>
         )}
       </div>
