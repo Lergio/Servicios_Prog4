@@ -138,7 +138,7 @@ correr docker nginx
 docker run --rm --name nginx-container --network deploy1 -d -p 80:80 -v "$PWD/nginx.conf:/etc/nginx/conf.d/default.conf" -v "$PWD/proyectos/staticfiles:/app/staticfiles" nginx
 
 archivo nginx.conf en la raiz del proyecto
-server { listen 80; server_name 192.168.100.251; # dominio o IP
+server { listen 8080; server_name 181.199.159.26/; # dominio o IP
 
 location /static/ {
     alias /app/staticfiles/;  # Ruta donde se encuentran los archivos estáticos
