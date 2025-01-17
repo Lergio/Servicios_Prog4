@@ -1,0 +1,35 @@
+# servicios/views.py
+from rest_framework import viewsets, generics
+from rest_framework import filters
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Usuario, Servicio, Solicitud, Calificacion
+from .serializers import UsuarioSerializer, ServicioSerializer, SolicitudSerializer, CalificacionSerializer, AuthSerializer
+
+class UsuarioViewSet(viewsets.ModelViewSet):
+    queryset = Usuario.objects.all()
+    serializer_class = UsuarioSerializer
+
+class ServicioViewSet(viewsets.ModelViewSet):
+    queryset = Servicio.objects.all()
+    serializer_class = ServicioSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['titulo', 'categoria']
+
+class SolicitudViewSet(viewsets.ModelViewSet):
+    queryset = Solicitud.objects.all()
+    serializer_class = SolicitudSerializer
+
+class CalificacionViewSet(viewsets.ModelViewSet):
+    queryset = Calificacion.objects.all()
+    serializer_class = CalificacionSerializer
+
+# Nueva vista para autenticación
+class AuthView(generics.GenericAPIView):
+    serializer_class = AuthSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        return Response({'id': user.id, 'nombre': user.nombre, 'email': user.email, 'rol': user.rol}, status=status.HTTP_200_OK)
