@@ -19,10 +19,10 @@ const Login = () => {
   
     try {
       const response = await axios.post('http://181.199.159.26:8080/api/auth/login/', formData);
-      const { access, refresh } = response.data;
+      const { access, refresh, user } = response.data;
       localStorage.setItem('accessToken', access);
       localStorage.setItem('refreshToken', refresh);
-      
+      localStorage.setItem('user',JSON.stringify(user));
       console.log(response.data);
 
       // Redirigir al dashboard si el login es exitoso
