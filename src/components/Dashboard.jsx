@@ -107,35 +107,42 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <nav className="bg-blue-600 text-white p-4 flex justify-between items-center">
+    <div className="min-h-screen bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+      {/* Navbar */}
+      <nav className="bg-white text-gray-800 p-4 flex justify-between items-center shadow-md">
         <h1 className="text-2xl font-bold">Dashboard</h1>
-        <button
-          onClick={handleLogout}
-          className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
-        >
-          Logout
-        </button>
-
-        <button
-          onClick={handleProfile}
-          className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
-        >
-          Profile
-        </button>
+        <div className="flex space-x-4">
+          <button
+            onClick={handleProfile}
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded transition duration-200"
+          >
+            Perfil
+          </button>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded transition duration-200"
+          >
+            Salir
+          </button>
+        </div>
       </nav>
 
       <div className="p-8">
-        <h1 className="text-3xl font-bold mb-8 text-center">Bienvenido al Dashboard</h1>
+        <h1 className="text-3xl font-bold mb-8 text-center text-white">Bienvenido al Dashboard</h1>
 
         <button
           onClick={() => setShowForm(true)}
-          className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded mb-8"
+          className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded mb-8 transition duration-200"
         >
           Ofrecer Servicio
         </button>
 
-        {showForm && <ServiceForm onServiceAdded={handleServiceAdded} />}
+        {showForm && (
+          <ServiceForm
+            onServiceAdded={handleServiceAdded}
+            onClose={() => setShowForm(null)}
+          />
+        )}
 
         {editingService && (
           <ServiceUpdate
@@ -147,22 +154,22 @@ const Dashboard = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {services.map((service) => (
-            <section key={service.id} className="bg-white p-6 rounded shadow-md">
-              <h2 className="text-xl font-bold mb-4">{service.titulo}</h2>
-              <p>{service.descripcion}</p>
+            <section key={service.id} className="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition duration-300 ease-in-out">
+              <h2 className="text-xl font-bold mb-4 text-gray-800">{service.titulo}</h2>
+              <p className="text-gray-700 mb-4">{service.descripcion}</p>
               <span className="text-sm text-gray-500">{service.categoria}</span>
               <div className="flex justify-end mt-4 space-x-2">
                 {service.id_oferente === loggedInUserId ? (
                   <>
                     <button
                       onClick={() => handleEdit(service)}
-                      className="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-3 rounded"
+                      className="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-3 rounded transition duration-200"
                     >
                       Actualizar
                     </button>
                     <button
                       onClick={() => handleDelete(service.id)}
-                      className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded"
+                      className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded transition duration-200"
                     >
                       Borrar
                     </button>
@@ -170,7 +177,7 @@ const Dashboard = () => {
                 ) : (
                   <button
                     onClick={() => handleRequest(service.id)}
-                    className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded"
+                    className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded transition duration-200"
                   >
                     Solicitar
                   </button>
