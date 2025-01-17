@@ -4,11 +4,11 @@ import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    username: '' ,
+    username: '',
     email: '',
     first_name: '',
     last_name: '',
-    password:''
+    password: ''
   });
 
   const navigate = useNavigate();
@@ -19,23 +19,22 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       const response = await axios.post('http://181.199.159.26:8080/api/auth/register/', formData);
       const { access, refresh } = response.data;
       localStorage.setItem('accessToken', access);
       localStorage.setItem('refreshToken', refresh);
-      
+
       console.log(response.data);
 
-      // Redirigir al dashboard si el login es exitoso
       navigate('/login');
     } catch (error) {
-      console.error('Error al iniciar sesión:', error);
+      console.error('Error during registration:', error);
     }
   };
 
-  {return (
+  return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
@@ -43,19 +42,13 @@ const Register = () => {
           <input type="text" name="username" placeholder="Username" onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
           <input type="email" name="email" placeholder="Email" onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
           <input type="password" name="password" placeholder="Password" onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
-          <input type="text" name="first_name" placeholder="First_name" onChange={handleChange} className="w-full p-2 border border-gray-300 rounded" />
-          <input type="text" name="last_name" placeholder="Last_name" onChange={handleChange} className="w-full p-2 border border-gray-300 rounded" />
-          {/* <select name="rol" onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded">
-            <option value="">Select Role</option>
-            <option value="role1">Provider</option>
-            <option value="role2">Seeker</option>
-            <option value="role3">Both</option>
-          </select> */}
+          <input type="text" name="first_name" placeholder="First Name" onChange={handleChange} required className="w-full p-2 border border-gray-300 rounded" />
+          <input type="text" name="last_name" placeholder="Last Name" onChange={handleChange} className="w-full p-2 border border-gray-300 rounded" />
           <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Register</button>
         </form>
       </div>
     </div>
-  );}
+  );
 };
 
 export default Register;

@@ -114,14 +114,14 @@ const Dashboard = () => {
           onClick={handleLogout}
           className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
         >
-          Logout
+          Cerrar Sesión
         </button>
 
         <button
           onClick={handleProfile}
           className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
         >
-          Profile
+          Perfil
         </button>
       </nav>
 
