@@ -8,11 +8,14 @@ const Dashboard = () => {
   const [services, setServices] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingService, setEditingService] = useState(null); // Estado para el servicio en edición
+  const [serviceToDelete, setServiceToDelete] = useState(null);
+  const [serviceToRequest, setServiceToRequest] = useState(null);
+  const [requestComment, setRequestComment] = useState('');
   const navigate = useNavigate();
 
   // Obtener el id del usuario logeado desde localStorage
   const user = JSON.parse(localStorage.getItem('user'));
-  const loggedInUserId = user?.id;
+  const usuario_id = user.id;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,6 +35,9 @@ const Dashboard = () => {
         });
 
         setServices(response.data);
+
+        console.log('ID del usuario logeado:', usuario_id);
+        console.log('Servicios obtenidos:', response.data);
       } catch (error) {
         console.error('Error al obtener los servicios:', error);
         if (error.response && error.response.status === 401) {
@@ -47,7 +53,11 @@ const Dashboard = () => {
 
   const handleProfile = () => {
     navigate('/profile');
-  }
+  };
+
+  const handleRequestPage = () => {
+    navigate('/requests');
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
@@ -74,41 +84,72 @@ const Dashboard = () => {
     setEditingService(service);
   };
 
-  const handleDelete = async (serviceId) => {
-    if (window.confirm("¿Estás seguro de que deseas eliminar este servicio?")) {
-      try {
-        const token = localStorage.getItem('accessToken');
-        if (!token) {
-          console.error('No se encontró el token de autenticación');
-          return;
-        }
-  
-        await axios.delete(`http://181.199.159.26:8000/api/servicios/${serviceId}/`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-  
-        // Actualizar la lista de servicios después de eliminar
-        setServices((prevServices) =>
-          prevServices.filter((service) => service.id !== serviceId)
-        );
-        alert("Servicio eliminado con éxito.");
-      } catch (error) {
-        console.error('Error al eliminar el servicio:', error);
-        alert("Ocurrió un error al intentar eliminar el servicio.");
+  const handleDelete = (serviceId) => {
+    setServiceToDelete(serviceId);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        console.error('No se encontró el token de autenticación');
+        return;
       }
+      await axios.delete(`http://181.199.159.26:8000/api/servicios/${serviceToDelete}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setServices((prevServices) =>
+        prevServices.filter((service) => service.id !== serviceToDelete)
+      );
+      console.log('Servicio eliminado con éxito.');
+    } catch (error) {
+      console.error('Error al eliminar el servicio:', error);
+    } finally {
+      setServiceToDelete(null);
     }
   };
 
   const handleRequest = (serviceId) => {
-    // Aquí iría la lógica para solicitar un servicio.
-    console.log(`Solicitando servicio con ID: ${serviceId}`);
+    setServiceToRequest(serviceId);
+  };
+
+  const confirmRequest = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        console.error('No se encontró el token de autenticación');
+        return;
+      }
+
+      const requestBody = {
+        comentario: requestComment,
+        estado: 'pendiente',
+        id_servicio: serviceToRequest,
+        id_busqueda: usuario_id,
+      };
+
+      console.log(requestBody)
+
+      await axios.post('http://181.199.159.26:8000/api/solicitudes/', requestBody, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log('Solicitud enviada con éxito.');
+    } catch (error) {
+      console.error('Error al enviar la solicitud:', error);
+    } finally {
+      setServiceToRequest(null);
+      setRequestComment('');
+    }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
-      {/* Navbar */}
       <nav className="bg-white text-gray-800 p-4 flex justify-between items-center shadow-md">
         <h1 className="text-2xl font-bold">Dashboard</h1>
         <div className="flex space-x-4">
@@ -117,6 +158,12 @@ const Dashboard = () => {
             className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded transition duration-200"
           >
             Perfil
+          </button>
+          <button
+            onClick={handleRequestPage}
+            className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded transition duration-200"
+          >  
+            Mis Solicitudes
           </button>
           <button
             onClick={handleLogout}
@@ -140,7 +187,7 @@ const Dashboard = () => {
         {showForm && (
           <ServiceForm
             onServiceAdded={handleServiceAdded}
-            onClose={() => setShowForm(null)}
+            onClose={() => setShowForm(false)}
           />
         )}
 
@@ -154,12 +201,25 @@ const Dashboard = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {services.map((service) => (
-            <section key={service.id} className="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition duration-300 ease-in-out">
+            <section
+              key={service.id}
+              className="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition duration-300 ease-in-out"
+            >
               <h2 className="text-xl font-bold mb-4 text-gray-800">{service.titulo}</h2>
-              <p className="text-gray-700 mb-4">{service.descripcion}</p>
-              <span className="text-sm text-gray-500">{service.categoria}</span>
+              <p className="text-gray-700 mb-2">
+                <strong>Descripción:</strong> {service.descripcion}
+              </p>
+              <p className="text-gray-700 mb-2">
+                <strong>Duración estimada:</strong> {service.duracion_estimada}
+              </p>
+              <p className="text-gray-700 mb-2">
+                <strong>Disponibilidad horaria:</strong> {service.disponibilidad_horaria}
+              </p>
+              <span className="text-sm text-gray-500 block mt-2">
+                <strong>Categoría:</strong> {service.categoria}
+              </span>
               <div className="flex justify-end mt-4 space-x-2">
-                {service.id_oferente === loggedInUserId ? (
+                {service.id_oferente === usuario_id ? (
                   <>
                     <button
                       onClick={() => handleEdit(service)}
@@ -187,6 +247,60 @@ const Dashboard = () => {
           ))}
         </div>
       </div>
+
+      {serviceToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-bold mb-4">Confirmar eliminación</h2>
+            <p className="text-gray-700 mb-6">
+              ¿Estás seguro de que deseas eliminar este servicio?
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => setServiceToDelete(null)}
+                className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+{serviceToRequest && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-bold mb-4">Crear Solicitud</h2>
+            <p className="text-gray-700 mb-4">Por favor, agrega un comentario para esta solicitud:</p>
+            <textarea
+              value={requestComment}
+              onChange={(e) => setRequestComment(e.target.value)}
+              className="w-full border border-gray-300 p-2 rounded mb-4"
+              placeholder="Escribe un comentario..."
+            />
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => setServiceToRequest(null)}
+                className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmRequest}
+                className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
