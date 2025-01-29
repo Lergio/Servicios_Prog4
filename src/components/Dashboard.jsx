@@ -25,7 +25,7 @@ const Dashboard = () => {
           return;
         }
 
-        const response = await axios.get('http://181.199.159.26:8080/api/servicios', {
+        const response = await axios.get('http://181.199.159.26:8000/api/servicios', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -83,7 +83,7 @@ const Dashboard = () => {
           return;
         }
   
-        await axios.delete(`http://181.199.159.26:8080/api/servicios/${serviceId}/`, {
+        await axios.delete(`http://181.199.159.26:8000/api/servicios/${serviceId}/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
