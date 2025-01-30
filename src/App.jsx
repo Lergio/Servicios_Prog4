@@ -11,6 +11,7 @@ import Home from './components/Home';
 import Profile from './components/Profile';
 import ServiceRequestModal from './components/ServiceRequestModal';
 import RequestsPage from './components/RequestPage';
+import RatingsPage from './components/RatingsPage';
 
 const App = () => {
   return (
@@ -28,6 +29,7 @@ const App = () => {
           <Route path="/ratings/new" element={<RatingForm />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/ratings" element={<RatingsPage />} />
         </Routes>
       </div>
     </Router>

@@ -21,37 +21,37 @@ const RequestsPage = () => {
         console.error("No se encontró el token de autenticación");
         return;
       }
-  
+
       const profileResponse = await axios.get("http://181.199.159.26:8000/api/auth/profile/", {
         headers: { Authorization: `Bearer ${token}` },
       });
-  
+
       const usuarioId = profileResponse.data.id;
       setUsuarioId(usuarioId);
-  
+
       // Obtener todos los servicios
       const serviciosResponse = await axios.get("http://181.199.159.26:8000/api/servicios/", {
         headers: { Authorization: `Bearer ${token}` },
       });
-  
+
       // Filtrar los servicios que el usuario ha publicado
       const serviciosPublicados = serviciosResponse.data.filter(servicio => servicio.id_oferente === usuarioId);
       const idsServiciosPublicados = serviciosPublicados.map(servicio => servicio.id);
-  
+
       // Obtener todas las solicitudes
       const solicitudesResponse = await axios.get("http://181.199.159.26:8000/api/solicitudes/", {
         headers: { Authorization: `Bearer ${token}` },
       });
-  
+
       // Filtrar las solicitudes en dos tipos:
       const solicitudesRecibidas = solicitudesResponse.data.filter(solicitud =>
         idsServiciosPublicados.includes(solicitud.id_servicio) // Recibidas: el usuario ofrece el servicio
       );
-  
+
       const solicitudesRealizadas = solicitudesResponse.data.filter(solicitud =>
         solicitud.id_busqueda === usuarioId // Realizadas: el usuario es el que hace la solicitud
       );
-  
+
       // Enriquecer las solicitudes con el nombre de usuario y el título del servicio
       const enrichedRequestsRecibidas = await Promise.all(
         solicitudesRecibidas.map(async (request) => {
@@ -59,7 +59,7 @@ const RequestsPage = () => {
             fetchUsername(request.id_busqueda, token),
             fetchServiceTitle(request.id_servicio, token),
           ]);
-  
+
           return {
             ...request,
             username,
@@ -67,14 +67,14 @@ const RequestsPage = () => {
           };
         })
       );
-  
+
       const enrichedRequestsRealizadas = await Promise.all(
         solicitudesRealizadas.map(async (request) => {
           const [username, serviceTitle] = await Promise.all([
             fetchUsername(request.id_busqueda, token),
             fetchServiceTitle(request.id_servicio, token),
           ]);
-  
+
           return {
             ...request,
             username,
@@ -82,17 +82,17 @@ const RequestsPage = () => {
           };
         })
       );
-  
+
       // Guardar las solicitudes separadas en el estado
       setRequests({ recibidas: enrichedRequestsRecibidas, realizadas: enrichedRequestsRealizadas });
-  
+
     } catch (error) {
       console.error("Error al obtener las solicitudes:", error);
       setError("Ocurrió un error al cargar las solicitudes.");
     } finally {
       setLoading(false);
     }
-  };  
+  };
 
   const fetchUsername = async (userId, token) => {
     try {
@@ -102,19 +102,19 @@ const RequestsPage = () => {
         });
         return profileResponse.data.username || "Desconocido";
       }
-  
+
       // Hacer la solicitud al endpoint para obtener el username de otro usuario
       const userResponse = await axios.get(`http://181.199.159.26:8000/api/auth/profile/${userId}/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       return userResponse.data.username || "Desconocido"; // Retornar el username o un valor por defecto
     } catch (error) {
       console.error(`Error al obtener el username del usuario ${userId}:`, error);
       return "Desconocido"; // Valor por defecto en caso de error
     }
   };
-  
+
 
   const fetchServiceTitle = async (serviceId, token) => {
     try {
@@ -194,7 +194,6 @@ const RequestsPage = () => {
             {/* Solicitudes Recibidas */}
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-white">Solicitudes Recibidas</h2>
-
               {requests.recibidas.length === 0 ? (
                 <p className="text-gray-300 mt-4">Aquí aparecerán cuando alguien solicite tus servicios.</p>
               ) : (
@@ -204,36 +203,39 @@ const RequestsPage = () => {
                       <h3 className="text-lg font-bold text-gray-800">{request.serviceTitle}</h3>
                       <p className="text-gray-700 mb-4">Solicitado por: {request.username}</p>
                       <p className="text-gray-500 text-sm">{request.comentario}</p>
-                      <div className="mt-4 flex space-x-4">
-                        {request.estado === "pendiente" ? (
-                          <>
-                            <button
-                              onClick={() => updateRequestStatus(request.id, "aceptada")}
-                              className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
-                            >
-                              Aceptar
-                            </button>
-                            <button
-                              onClick={() => updateRequestStatus(request.id, "rechazada")}
-                              className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
-                            >
-                              Rechazar
-                            </button>
-                          </>
-                        ) : (
-                          <span className="italic text-gray-500">Solicitud {request.estado}</span>
-                        )}
-                      </div>
+
+                      {/* Mostrar botones de Aceptar y Rechazar solo si la solicitud está pendiente */}
+                      {request.estado === "pendiente" && (
+                        <div className="mt-4 flex space-x-4">
+                          <button
+                            onClick={() => updateRequestStatus(request.id, "aceptada")}
+                            className="bg-green-500 text-white py-2 px-4 rounded"
+                          >
+                            Aceptar
+                          </button>
+                          <button
+                            onClick={() => updateRequestStatus(request.id, "rechazada")}
+                            className="bg-red-500 text-white py-2 px-4 rounded"
+                          >
+                            Rechazar
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Si la solicitud fue aceptada, mostrar mensaje de calificación pendiente */}
+                      {request.estado === "aceptada" && !request.calificacion && (
+                        <div className="mt-4 text-gray-600">
+                          <p><strong>Este servicio ha sido aceptado, pero aún {request.username} no calificó tu trabajo.</strong></p>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
               )}
             </section>
-
             {/* Solicitudes Realizadas */}
             <section>
               <h2 className="text-2xl font-semibold text-white">Solicitudes Realizadas</h2>
-
               {requests.realizadas.length === 0 ? (
                 <p className="text-gray-300 mt-4">Aquí aparecerán cuando solicites un servicio.</p>
               ) : (
@@ -244,6 +246,18 @@ const RequestsPage = () => {
                       <p className="text-gray-700 mb-4">Solicitado a: {request.username}</p>
                       <p className="text-gray-500 text-sm">{request.comentario}</p>
                       <p className="text-sm text-gray-500 mt-4">Estado: {request.estado}</p>
+
+                      {/* Mostrar botón para calificar si el servicio ha sido aceptado */}
+                      {request.estado === "aceptada" && !request.calificacion && (
+                        <div className="mt-4">
+                          <button
+                            onClick={() => navigate("/ratings", { state: { id_servicio: request.id_servicio } })} // Pasamos el id_servicio en el estado
+                            className="bg-yellow-500 text-white py-2 px-4 rounded"
+                          >
+                            Calificar Trabajo
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
