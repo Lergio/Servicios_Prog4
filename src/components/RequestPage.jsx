@@ -21,36 +21,45 @@ const RequestsPage = () => {
         console.error("No se encontró el token de autenticación");
         return;
       }
-
+  
       const profileResponse = await axios.get("http://181.199.159.26:8000/api/auth/profile/", {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+  
       const usuarioId = profileResponse.data.id;
       setUsuarioId(usuarioId);
-
+  
+      // Obtener todos los servicios
       const serviciosResponse = await axios.get("http://181.199.159.26:8000/api/servicios/", {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+  
+      // Filtrar los servicios que el usuario ha publicado
       const serviciosPublicados = serviciosResponse.data.filter(servicio => servicio.id_oferente === usuarioId);
       const idsServiciosPublicados = serviciosPublicados.map(servicio => servicio.id);
-
+  
+      // Obtener todas las solicitudes
       const solicitudesResponse = await axios.get("http://181.199.159.26:8000/api/solicitudes/", {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      const solicitudesFiltradas = solicitudesResponse.data.filter(solicitud =>
-        idsServiciosPublicados.includes(solicitud.id_servicio)
+  
+      // Filtrar las solicitudes en dos tipos:
+      const solicitudesRecibidas = solicitudesResponse.data.filter(solicitud =>
+        idsServiciosPublicados.includes(solicitud.id_servicio) // Recibidas: el usuario ofrece el servicio
       );
-
-      const enrichedRequests = await Promise.all(
-        solicitudesFiltradas.map(async (request) => {
+  
+      const solicitudesRealizadas = solicitudesResponse.data.filter(solicitud =>
+        solicitud.id_busqueda === usuarioId // Realizadas: el usuario es el que hace la solicitud
+      );
+  
+      // Enriquecer las solicitudes con el nombre de usuario y el título del servicio
+      const enrichedRequestsRecibidas = await Promise.all(
+        solicitudesRecibidas.map(async (request) => {
           const [username, serviceTitle] = await Promise.all([
             fetchUsername(request.id_busqueda, token),
             fetchServiceTitle(request.id_servicio, token),
           ]);
-
+  
           return {
             ...request,
             username,
@@ -58,15 +67,32 @@ const RequestsPage = () => {
           };
         })
       );
-
-      setRequests(enrichedRequests);
+  
+      const enrichedRequestsRealizadas = await Promise.all(
+        solicitudesRealizadas.map(async (request) => {
+          const [username, serviceTitle] = await Promise.all([
+            fetchUsername(request.id_busqueda, token),
+            fetchServiceTitle(request.id_servicio, token),
+          ]);
+  
+          return {
+            ...request,
+            username,
+            serviceTitle,
+          };
+        })
+      );
+  
+      // Guardar las solicitudes separadas en el estado
+      setRequests({ recibidas: enrichedRequestsRecibidas, realizadas: enrichedRequestsRealizadas });
+  
     } catch (error) {
       console.error("Error al obtener las solicitudes:", error);
       setError("Ocurrió un error al cargar las solicitudes.");
     } finally {
       setLoading(false);
     }
-  };
+  };  
 
   const fetchUsername = async (userId, token) => {
     try {
@@ -163,56 +189,67 @@ const RequestsPage = () => {
             <p className="mt-2 text-lg font-semibold">Ocurrió un error</p>
             <p className="text-sm">{error}</p>
           </div>
-        ) : requests.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-10 text-gray-700">
-            <Inbox className="w-10 h-10 text-gray-400" />
-            <p className="mt-2 text-lg font-semibold">No hay solicitudes pendientes</p>
-            <p className="text-sm text-gray-500">Aquí aparecerán cuando alguien solicite tus servicios.</p>
-          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {requests.map((request) => (
-              <section
-                key={request.id}
-                className="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition duration-300 ease-in-out"
-              >
-                <h2 className="text-xl font-bold mb-4 text-gray-800">
-                  <p className="text-gray-700 mb-2">
-                    <strong>{request.serviceTitle}</strong>
-                  </p>
-                </h2>
-                <p className="text-gray-700 mb-2">
-                  <strong>Comentario:</strong> {request.comentario}
-                </p>
-                <p className="text-gray-700 mb-2">
-                  <strong>Estado:</strong> {request.estado}
-                </p>
-                <p className="text-gray-700 mb-2">
-                  <strong>Solicitante:</strong> {request.username}
-                </p>
-                <div className="flex justify-end mt-4 space-x-2">
-                  {request.estado === "pendiente" ? (
-                    <>
-                      <button
-                        onClick={() => updateRequestStatus(request.id, "aceptada")}
-                        className="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded transition duration-200"
-                      >
-                        Aceptar
-                      </button>
-                      <button
-                        onClick={() => updateRequestStatus(request.id, "rechazada")}
-                        className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded transition duration-200"
-                      >
-                        Rechazar
-                      </button>
-                    </>
-                  ) : (
-                    <span className="italic text-gray-500">Solicitud {request.estado}</span>
-                  )}
+          <>
+            {/* Solicitudes Recibidas */}
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold text-white">Solicitudes Recibidas</h2>
+
+              {requests.recibidas.length === 0 ? (
+                <p className="text-gray-300 mt-4">Aquí aparecerán cuando alguien solicite tus servicios.</p>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                  {requests.recibidas.map((request) => (
+                    <div key={request.id} className="bg-white p-6 rounded-lg shadow-lg">
+                      <h3 className="text-lg font-bold text-gray-800">{request.serviceTitle}</h3>
+                      <p className="text-gray-700 mb-4">Solicitado por: {request.username}</p>
+                      <p className="text-gray-500 text-sm">{request.comentario}</p>
+                      <div className="mt-4 flex space-x-4">
+                        {request.estado === "pendiente" ? (
+                          <>
+                            <button
+                              onClick={() => updateRequestStatus(request.id, "aceptada")}
+                              className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
+                            >
+                              Aceptar
+                            </button>
+                            <button
+                              onClick={() => updateRequestStatus(request.id, "rechazada")}
+                              className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
+                            >
+                              Rechazar
+                            </button>
+                          </>
+                        ) : (
+                          <span className="italic text-gray-500">Solicitud {request.estado}</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </section>
-            ))}
-          </div>
+              )}
+            </section>
+
+            {/* Solicitudes Realizadas */}
+            <section>
+              <h2 className="text-2xl font-semibold text-white">Solicitudes Realizadas</h2>
+
+              {requests.realizadas.length === 0 ? (
+                <p className="text-gray-300 mt-4">Aquí aparecerán cuando solicites un servicio.</p>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                  {requests.realizadas.map((request) => (
+                    <div key={request.id} className="bg-white p-6 rounded-lg shadow-lg">
+                      <h3 className="text-lg font-bold text-gray-800">{request.serviceTitle}</h3>
+                      <p className="text-gray-700 mb-4">Solicitado a: {request.username}</p>
+                      <p className="text-gray-500 text-sm">{request.comentario}</p>
+                      <p className="text-sm text-gray-500 mt-4">Estado: {request.estado}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          </>
         )}
       </main>
     </div>

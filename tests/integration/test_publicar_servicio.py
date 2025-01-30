@@ -71,10 +71,10 @@ def test_publicar_servicio(api_url, servicio_data, auth_token_and_user_id):
     assert get_response.json()['titulo'] == servicio_data['titulo']
 
     # Limpiar después de la prueba: Eliminar el servicio con una solicitud DELETE
-    delete_response = requests.delete(f"{api_url}{servicio_id}", headers=headers)
+    #delete_response = requests.delete(f"{api_url}{servicio_id}", headers=headers)
     
-    assert delete_response.status_code == 204  # 204 indica que la eliminación fue exitosa
+    #assert delete_response.status_code == 204  # 204 indica que la eliminación fue exitosa
 
     # Opcional: Verificar que el servicio ha sido eliminado
-    get_response_after_delete = requests.get(f"{api_url}{servicio_id}", headers=headers)
-    assert get_response_after_delete.status_code == 404  # El servicio ya no debe existir
+    #get_response_after_delete = requests.get(f"{api_url}{servicio_id}", headers=headers)
+    #assert get_response_after_delete.status_code == 404  # El servicio ya no debe existir

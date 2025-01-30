@@ -30,7 +30,7 @@ const ServiceForm = ({ onServiceAdded, onClose }) => {
       }
 
       const response = await axios.post(
-        'http://181.199.159.26:8080/api/servicios/',
+        'http://181.199.159.26:8000/api/servicios/',
         { ...formData, id_oferente },
         {
           headers: {
