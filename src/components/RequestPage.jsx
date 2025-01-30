@@ -76,17 +76,24 @@ const RequestsPage = () => {
         });
         return profileResponse.data.username || "Desconocido";
       }
-      return `Usuario ${userId}`;
+  
+      // Hacer la solicitud al endpoint para obtener el username de otro usuario
+      const userResponse = await axios.get(`http://181.199.159.26:8000/api/auth/profile/${userId}/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      return userResponse.data.username || "Desconocido"; // Retornar el username o un valor por defecto
     } catch (error) {
       console.error(`Error al obtener el username del usuario ${userId}:`, error);
-      return "Desconocido";
+      return "Desconocido"; // Valor por defecto en caso de error
     }
   };
+  
 
   const fetchServiceTitle = async (serviceId, token) => {
     try {
       const response = await axios.get(
-        `http://181.199.159.26:8000/api/servicios/${serviceId}`,
+        `http://181.199.159.26:8000/api/servicios/${serviceId}/`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       return response.data.titulo;
@@ -105,16 +112,16 @@ const RequestsPage = () => {
       }
 
       await axios.patch(
-        `http://181.199.159.26:8000/api/solicitudes/${id}`,
+        `http://181.199.159.26:8000/api/solicitudes/${id}/`,
         { estado: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert(`La solicitud ha sido ${newStatus}`);
+      console.log(`La solicitud ha sido ${newStatus}`);
       fetchRequests();
     } catch (error) {
       console.error(`Error al actualizar la solicitud ${id}:`, error);
-      alert("Ocurrió un error al actualizar la solicitud.");
+      // alert("Ocurrió un error al actualizar la solicitud.");
     }
   };
 
@@ -146,7 +153,7 @@ const RequestsPage = () => {
 
       <main className="flex-grow p-6 bg-transparent-100">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-10 text-white-700">
+          <div className="flex flex-col items-center justify-center py-10 text-gray-700">
             <Loader2 className="w-10 h-10 animate-spin text-indigo-500" />
             <p className="mt-2 text-lg font-semibold">Cargando solicitudes...</p>
           </div>
@@ -157,11 +164,11 @@ const RequestsPage = () => {
             <p className="text-sm">{error}</p>
           </div>
         ) : requests.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-10 text-white-700">
-              <Inbox className="w-10 h-10 text-white-400" />
-              <p className="mt-2 text-2xl font-semibold">No hay solicitudes pendientes</p>
-              <p className="text-base text-white-100">Aquí aparecerán cuando alguien solicite tus servicios.</p>
-            </div>
+          <div className="flex flex-col items-center justify-center py-10 text-gray-700">
+            <Inbox className="w-10 h-10 text-gray-400" />
+            <p className="mt-2 text-lg font-semibold">No hay solicitudes pendientes</p>
+            <p className="text-sm text-gray-500">Aquí aparecerán cuando alguien solicite tus servicios.</p>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {requests.map((request) => (
