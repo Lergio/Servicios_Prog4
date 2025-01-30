@@ -7,11 +7,28 @@ import ServiceUpdate from './ServiceUpdate';
 const Dashboard = () => {
   const [services, setServices] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [usernames, setUsernames] = useState({});
   const [editingService, setEditingService] = useState(null); // Estado para el servicio en edición
   const [serviceToDelete, setServiceToDelete] = useState(null);
   const [serviceToRequest, setServiceToRequest] = useState(null);
   const [requestComment, setRequestComment] = useState('');
+  const [filterTitle, setFilterTitle] = useState('');
+  const [filterCategory, setFilterCategory] = useState('');
+
   const navigate = useNavigate();
+
+  const categories = [
+    '',
+    'tecnologia',
+    'gastronomia',
+    'mantenimiento',
+    'salud',
+    'maestranza',
+    'ocio',
+    'gerontologia',
+    'venta',
+  ];
+
 
   // Obtener el id del usuario logeado desde localStorage
   const user = JSON.parse(localStorage.getItem('user'));
@@ -21,25 +38,43 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('accessToken');
-
         if (!token) {
           console.error('No se encontró el token de autenticación');
           navigate('/login');
           return;
         }
-
-        const response = await axios.get('http://181.199.159.26:8000/api/servicios', {
+  
+        // Obtener los servicios
+        const response = await axios.get('http://181.199.159.26:8000/api/servicios/', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          params: { titulo: filterTitle, categoria: filterCategory },
         });
-
+        
         setServices(response.data);
-
-        console.log('ID del usuario logeado:', usuario_id);
-        console.log('Servicios obtenidos:', response.data);
+  
+        // Obtener los usuarios que publicaron los servicios
+        const usersIds = response.data.map((service) => service.id_oferente);
+        const userPromises = usersIds.map((userId) =>
+          axios.get(`http://181.199.159.26:8000/api/auth/profile/${userId}/`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+        );
+  
+        // Esperar a que todas las respuestas estén disponibles
+        const usersResponses = await Promise.all(userPromises);
+        const usersData = usersResponses.reduce((acc, userProfile) => {
+          acc[userProfile.data.id] = userProfile.data.username;
+          return acc;
+        }, {});
+  
+        setUsernames(usersData);
+  
       } catch (error) {
-        console.error('Error al obtener los servicios:', error);
+        console.error('Error al obtener los servicios o los perfiles de usuario:', error);
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
@@ -47,10 +82,10 @@ const Dashboard = () => {
         }
       }
     };
-
+  
     fetchData();
-  }, [navigate]);
-
+  }, [navigate, filterTitle, filterCategory]);
+  
   const handleProfile = () => {
     navigate('/profile');
   };
@@ -176,6 +211,14 @@ const Dashboard = () => {
 
       <div className="p-8">
         <h1 className="text-3xl font-bold mb-8 text-center text-white">Bienvenido al Dashboard</h1>
+        <div className="mb-4 flex space-x-4">
+          <input type="text" value={filterTitle} onChange={(e) => setFilterTitle(e.target.value)} placeholder="Buscar por título" className="p-2 border rounded w-full" />
+          <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} className="p-2 border rounded">
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>{cat || 'Todas las categorías'}</option>
+            ))}
+          </select>
+        </div>
 
         <button
           onClick={() => setShowForm(true)}
@@ -214,6 +257,9 @@ const Dashboard = () => {
               </p>
               <p className="text-gray-700 mb-2">
                 <strong>Disponibilidad horaria:</strong> {service.disponibilidad_horaria}
+              </p>
+              <p className="text-gray-700 mb-2">
+               <strong>Publicado por:</strong> {usernames[service.id_oferente] || 'Cargando...'}
               </p>
               <span className="text-sm text-gray-500 block mt-2">
                 <strong>Categoría:</strong> {service.categoria}
