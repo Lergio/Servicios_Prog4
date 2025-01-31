@@ -34,7 +34,7 @@ const RequestsPage = () => {
         return;
       }
   
-      const profileResponse = await axios.get("http://181.199.159.26:8000/api/auth/profile/", {
+      const profileResponse = await axios.get("http://181.199.159.26:8010/api/auth/profile/", {
         headers: { Authorization: `Bearer ${token}` },
       });
   
@@ -51,7 +51,7 @@ const RequestsPage = () => {
       const idsServiciosPublicados = serviciosPublicados.map(servicio => servicio.id);
   
       // Obtener todas las solicitudes
-      const solicitudesResponse = await axios.get("http://181.199.159.26:8000/api/solicitudes/", {
+      const solicitudesResponse = await axios.get("http://181.199.159.26:8010/api/solicitudes/", {
         headers: { Authorization: `Bearer ${token}` },
       });
   
@@ -142,7 +142,7 @@ const RequestsPage = () => {
 
     try {
       const token = localStorage.getItem("accessToken");
-      await axios.post("http://181.199.159.26:8000/api/calificaciones/", newCalificacion, {
+      await axios.post("http://181.199.159.26:8010/api/calificaciones/", newCalificacion, {
         headers: { Authorization: `Bearer ${token}` },
       });
       alert("Calificación enviada con éxito");
@@ -157,7 +157,7 @@ const RequestsPage = () => {
 	const fetchCalificaciones = async (idServicio, idBusqueda, token) => {
 	  try {
 		const response = await axios.get(
-		  `http://181.199.159.26:8000/api/calificaciones/?id_servicio=${idServicio}&id_busqueda=${idBusqueda}`,
+		  `http://181.199.159.26:8010/api/calificaciones/?id_servicio=${idServicio}&id_busqueda=${idBusqueda}`,
 		  { headers: { Authorization: `Bearer ${token}` } }
 		);
 		return response.data; // Retorna las calificaciones
@@ -171,7 +171,7 @@ const RequestsPage = () => {
 	const fetchService = async (serviceId, token) => {
 	  try {
 		const response = await axios.get(
-		  `http://181.199.159.26:8000/api/servicios/${serviceId}/`,
+		  `http://181.199.159.26:8010/api/servicios/${serviceId}/`,
 		  { headers: { Authorization: `Bearer ${token}` } }
 		);
 		return response.data; // Retorna el objeto del servicio completo
@@ -184,14 +184,14 @@ const RequestsPage = () => {
   const fetchUsername = async (userId, token) => {
     try {
       if (userId === usuarioId) {
-        const profileResponse = await axios.get("http://181.199.159.26:8000/api/auth/profile/", {
+        const profileResponse = await axios.get("http://181.199.159.26:8010/api/auth/profile/", {
           headers: { Authorization: `Bearer ${token}` },
         });
         return profileResponse.data.username || "Desconocido";
       }
   
       // Hacer la solicitud al endpoint para obtener el username de otro usuario
-      const userResponse = await axios.get(`http://181.199.159.26:8000/api/auth/profile/${userId}/`, {
+      const userResponse = await axios.get(`http://181.199.159.26:8010/api/auth/profile/${userId}/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       
@@ -206,7 +206,7 @@ const RequestsPage = () => {
   const fetchServiceTitle = async (serviceId, token) => {
     try {
       const response = await axios.get(
-        `http://181.199.159.26:8000/api/servicios/${serviceId}/`,
+        `http://181.199.159.26:8010/api/servicios/${serviceId}/`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       return response.data.titulo;
@@ -225,7 +225,7 @@ const RequestsPage = () => {
       }
 
       await axios.patch(
-        `http://181.199.159.26:8000/api/solicitudes/${id}/`,
+        `http://181.199.159.26:8010/api/solicitudes/${id}/`,
         { estado: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
