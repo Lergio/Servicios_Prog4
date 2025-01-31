@@ -21,7 +21,7 @@ const ServiceDelete = ({ serviceId, onClose, onServiceDeleted }) => {
         }
 
         const response = await axios.get(
-          `http://181.199.159.26:8080/api/servicios/${serviceId}/`,
+          `http://181.199.159.26:8010/api/servicios/${serviceId}/`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -53,7 +53,7 @@ const ServiceDelete = ({ serviceId, onClose, onServiceDeleted }) => {
         return;
       }
 
-      await axios.delete(`http://181.199.159.26:8080/api/servicios/${serviceId}/`, {
+      await axios.delete(`http://181.199.159.26:8010/api/servicios/${serviceId}/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
