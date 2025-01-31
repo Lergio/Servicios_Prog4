@@ -12,7 +12,7 @@ const RatingsPage = ({ isModalOpen, closeModal, request }) => {
     if (token) {
       const fetchUserProfile = async () => {
         try {
-          const profileResponse = await axios.get("http://181.199.159.26:8000/api/auth/profile/", {
+          const profileResponse = await axios.get("http://181.199.159.26:8010/api/auth/profile/", {
             headers: { Authorization: `Bearer ${token}` },
           });
           setUsuarioId(profileResponse.data.id); 
@@ -42,7 +42,7 @@ const RatingsPage = ({ isModalOpen, closeModal, request }) => {
     try {
       if (usuarioId) {
         await axios.post(
-          "http://181.199.159.26:8000/api/calificaciones/",
+          "http://181.199.159.26:8010/api/calificaciones/",
           {
             calificacion,
             comentario,
