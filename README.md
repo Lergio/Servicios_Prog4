@@ -30,7 +30,7 @@ El componente **Login.jsx** maneja el inicio de sesión de los usuarios registra
 
 ---
 
-## 3. Dashboard
+### 3. Dashboard
 
 El **Dashboard** es la pantalla principal de la aplicación donde los usuarios pueden visualizar, crear, actualizar y solicitar servicios. 
 
@@ -112,7 +112,7 @@ El componente **ServiceDelete.jsx** permite a los usuarios eliminar un servicio 
 - **Notificación y Cierre**: Después de eliminar el servicio, notifica al componente padre que el servicio ha sido eliminado y cierra el formulario.
 
 ---
-## 9. Componente `ServiceRequestModal`
+### 9. Componente `ServiceRequestModal`
 
 El componente `ServiceRequestModal` es un modal de React utilizado para que los usuarios puedan escribir y enviar una solicitud de servicio agregando un comentario.
 
@@ -135,7 +135,7 @@ El componente **RequestsPage.jsx** permite a los usuarios ver las solicitudes re
 - **Interfaz Interactiva**: Muestra las solicitudes con un diseño claro e intuitivo, permitiendo a los usuarios gestionar fácilmente sus peticiones.
 
 ---
-## 11. Filtros de Búsqueda
+### 11. Filtros de Búsqueda
 
 El Dashboard permite filtrar los servicios por **título** y **categoría**. Esto facilita a los usuarios encontrar los servicios que buscan de manera más eficiente.
 
