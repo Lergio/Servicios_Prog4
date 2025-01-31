@@ -48,7 +48,7 @@ const Dashboard = () => {
         }
   
         // Obtener los servicios
-        const response = await axios.get('http://181.199.159.26:8000/api/servicios/', {
+        const response = await axios.get('http://181.199.159.26:8010/api/servicios/', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -60,7 +60,7 @@ const Dashboard = () => {
         // Obtener los usuarios que publicaron los servicios
         const usersIds = response.data.map((service) => service.id_oferente);
         const userPromises = usersIds.map((userId) =>
-          axios.get(`http://181.199.159.26:8000/api/auth/profile/${userId}/`, {
+          axios.get(`http://181.199.159.26:8010/api/auth/profile/${userId}/`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -78,7 +78,7 @@ const Dashboard = () => {
 
 		// Obtener las calificaciones para cada servicio
 		const ratingsPromises = response.data.map(async (service) => {
-		  const ratingsResponse = await axios.get(`http://181.199.159.26:8000/api/calificaciones/?id_servicio=${service.id}`, {
+		  const ratingsResponse = await axios.get(`http://181.199.159.26:8010/api/calificaciones/?id_servicio=${service.id}`, {
 			headers: {
 			  Authorization: `Bearer ${token}`, // Agregar el token aquí
 			},
@@ -153,7 +153,7 @@ const Dashboard = () => {
         console.error('No se encontró el token de autenticación');
         return;
       }
-      await axios.delete(`http://181.199.159.26:8000/api/servicios/${serviceToDelete}/`, {
+      await axios.delete(`http://181.199.159.26:8010/api/servicios/${serviceToDelete}/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -191,7 +191,7 @@ const Dashboard = () => {
 
       console.log(requestBody)
 
-      await axios.post('http://181.199.159.26:8000/api/solicitudes/', requestBody, {
+      await axios.post('http://181.199.159.26:8010/api/solicitudes/', requestBody, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
