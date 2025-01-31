@@ -26,7 +26,7 @@ const Profile = () => {
           navigate('/login');
           return;
         }
-        const response = await axios.get('http://181.199.159.26:8080/api/auth/profile/', {
+        const response = await axios.get('http://181.199.159.26:8010/api/auth/profile/', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -56,7 +56,7 @@ const Profile = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await axios.patch('http://181.199.159.26:8080/api/auth/profile/', formData, {
+      const response = await axios.patch('http://181.199.159.26:8010/api/auth/profile/', formData, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -72,7 +72,7 @@ const Profile = () => {
   const handleDelete = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      await axios.delete('http://181.199.159.26:8080/api/auth/profile/', {
+      await axios.delete('http://181.199.159.26:8010/api/auth/profile/', {
         headers: {
           Authorization: `Bearer ${token}`
         }
