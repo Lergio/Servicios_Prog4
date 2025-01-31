@@ -21,7 +21,7 @@ const ServiceUpdate = ({ serviceId, onClose, onServiceUpdated }) => {
         }
 
         const response = await axios.get(
-          `http://181.199.159.26:8080/api/servicios/${serviceId}/`,
+          `http://181.199.159.26:8010/api/servicios/${serviceId}/`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -70,7 +70,7 @@ const ServiceUpdate = ({ serviceId, onClose, onServiceUpdated }) => {
       };
 
       const response = await axios.patch(
-        `http://181.199.159.26:8080/api/servicios/${serviceId}/`,
+        `http://181.199.159.26:8010/api/servicios/${serviceId}/`,
         patchData,
         {
           headers: {
