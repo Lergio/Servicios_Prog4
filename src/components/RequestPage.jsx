@@ -42,7 +42,7 @@ const RequestsPage = () => {
       setUsuarioId(usuarioId);
   
       // Obtener todos los servicios
-      const serviciosResponse = await axios.get("http://181.199.159.26:8000/api/servicios/", {
+      const serviciosResponse = await axios.get("http://181.199.159.26:8010/api/servicios/", {
         headers: { Authorization: `Bearer ${token}` },
       });
   
