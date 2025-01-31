@@ -14,6 +14,7 @@ const Dashboard = () => {
   const [requestComment, setRequestComment] = useState('');
   const [filterTitle, setFilterTitle] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
+  const [ratings, setRatings] = useState({}); // Estado para almacenar los promedios de calificaciones
 
   const navigate = useNavigate();
 
@@ -33,6 +34,8 @@ const Dashboard = () => {
   // Obtener el id del usuario logeado desde localStorage
   const user = JSON.parse(localStorage.getItem('user'));
   const usuario_id = user.id;
+  const usuario_name = user.username;
+  console.log(usuario_name)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -72,7 +75,27 @@ const Dashboard = () => {
         }, {});
   
         setUsernames(usersData);
-  
+
+		// Obtener las calificaciones para cada servicio
+		const ratingsPromises = response.data.map(async (service) => {
+		  const ratingsResponse = await axios.get(`http://181.199.159.26:8000/api/calificaciones/?id_servicio=${service.id}`, {
+			headers: {
+			  Authorization: `Bearer ${token}`, // Agregar el token aquí
+			},
+		  });
+          const ratingsData = ratingsResponse.data;
+          const averageRating = ratingsData.length > 0 ? ratingsData.reduce((sum, rating) => sum + rating.calificacion, 0) / ratingsData.length : 0;
+          return { serviceId: service.id, averageRating };
+        });
+
+        const ratingsResults = await Promise.all(ratingsPromises);
+        const ratingsMap = ratingsResults.reduce((acc, { serviceId, averageRating }) => {
+          acc[serviceId] = averageRating;
+          return acc;
+        }, {});
+
+        setRatings(ratingsMap);
+        
       } catch (error) {
         console.error('Error al obtener los servicios o los perfiles de usuario:', error);
         if (error.response && error.response.status === 401) {
@@ -186,7 +209,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
       <nav className="bg-white text-gray-800 p-4 flex justify-between items-center shadow-md">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <h1 className="text-2xl font-bold">Dashboard. Hola { usuario_name }</h1>
         <div className="flex space-x-4">
           <button
             onClick={handleProfile}
@@ -210,7 +233,6 @@ const Dashboard = () => {
       </nav>
 
       <div className="p-8">
-        <h1 className="text-3xl font-bold mb-8 text-center text-white">Bienvenido al Dashboard</h1>
         <div className="mb-4 flex space-x-4">
           <input type="text" value={filterTitle} onChange={(e) => setFilterTitle(e.target.value)} placeholder="Buscar por título" className="p-2 border rounded w-full" />
           <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} className="p-2 border rounded">
@@ -264,6 +286,9 @@ const Dashboard = () => {
               <span className="text-sm text-gray-500 block mt-2">
                 <strong>Categoría:</strong> {service.categoria}
               </span>
+              <p className="text-gray-700 mb-2">
+              <strong>Promedio de Calificaciones:</strong> {ratings[service.id] ? ratings[service.id].toFixed(2) : 'Aun no tienes calificaciones'}
+            </p>
               <div className="flex justify-end mt-4 space-x-2">
                 {service.id_oferente === usuario_id ? (
                   <>

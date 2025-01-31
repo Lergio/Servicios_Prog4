@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useLocation, useNavigate } from "react-router-dom";
 
-const RatingsPage = () => {
+const RatingsPage = ({ isModalOpen, closeModal, request }) => {
   const [calificacion, setCalificacion] = useState(0);
   const [comentario, setComentario] = useState("");
   const [loading, setLoading] = useState(false);
   const [usuarioId, setUsuarioId] = useState(null);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { id_servicio } = location.state || {};  // Accedemos al id_servicio pasado a través del estado
   const token = localStorage.getItem("accessToken");
 
   useEffect(() => {
@@ -45,20 +41,19 @@ const RatingsPage = () => {
 
     try {
       if (usuarioId) {
-        // Usamos el id_servicio obtenido del estado
         await axios.post(
           "http://181.199.159.26:8000/api/calificaciones/",
           {
             calificacion,
             comentario,
-            id_servicio,  // Usamos el id_servicio
+            id_servicio: request.id_servicio,  // Usamos el id_servicio pasado desde el request
             id_busqueda: usuarioId,  // El usuarioId sigue siendo relevante
           },
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
         alert("Calificación enviada con éxito!");
-        navigate("/ratings");  // Redirigir al dashboard después de calificar
+        closeModal();  // Cerrar el modal después de enviar la calificación
       } else {
         console.error("No se ha podido obtener el id del usuario.");
       }
@@ -70,43 +65,47 @@ const RatingsPage = () => {
     }
   };
 
+  if (!isModalOpen) return null; // No renderizamos el modal si está cerrado
+
   return (
-    <div className="p-6 bg-white rounded shadow-md">
-      <h2 className="text-xl font-bold">Calificar Trabajo Realizado</h2>
+    <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
+      <div className="p-6 bg-white rounded shadow-md">
+        <h2 className="text-xl font-bold">Calificar Trabajo Realizado</h2>
 
-      <div className="mt-4">
-        {[...Array(5)].map((_, index) => (
-          <span
-            key={index}
-            className={`cursor-pointer ${index < calificacion ? "text-yellow-500" : "text-gray-400"}`}
-            onClick={() => handleStarClick(index + 1)}
+        <div className="mt-4">
+          {[...Array(5)].map((_, index) => (
+            <span
+              key={index}
+              className={`cursor-pointer ${index < calificacion ? "text-yellow-500" : "text-gray-400"}`}
+              onClick={() => handleStarClick(index + 1)}
+            >
+              ★
+            </span>
+          ))}
+        </div>
+
+        <textarea
+          className="w-full mt-4 p-2 border border-gray-300 rounded"
+          placeholder="Deja tu comentario"
+          value={comentario}
+          onChange={(e) => setComentario(e.target.value)}
+        ></textarea>
+
+        <div className="flex justify-end mt-4 space-x-2">
+          <button
+            onClick={handleSubmit}
+            className="bg-green-500 text-white py-2 px-4 rounded"
+            disabled={loading}
           >
-            ★
-          </span>
-        ))}
-      </div>
-
-      <textarea
-        className="w-full mt-4 p-2 border border-gray-300 rounded"
-        placeholder="Deja tu comentario"
-        value={comentario}
-        onChange={(e) => setComentario(e.target.value)}
-      ></textarea>
-
-      <div className="flex justify-end mt-4 space-x-2">
-        <button
-          onClick={handleSubmit}
-          className="bg-green-500 text-white py-2 px-4 rounded"
-          disabled={loading}
-        >
-          {loading ? "Cargando..." : "Confirmar"}
-        </button>
-        <button
-          onClick={() => navigate("/ratings")}
-          className="bg-gray-500 text-white py-2 px-4 rounded"
-        >
-          Cancelar
-        </button>
+            {loading ? "Cargando..." : "Confirmar"}
+          </button>
+          <button
+            onClick={closeModal}
+            className="bg-gray-500 text-white py-2 px-4 rounded"
+          >
+            Cancelar
+          </button>
+        </div>
       </div>
     </div>
   );
