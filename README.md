@@ -30,14 +30,30 @@ El componente **Login.jsx** maneja el inicio de sesión de los usuarios registra
 
 ---
 
-### 3. **Dashboard.jsx**
+### 3. Dashboard
 
-El componente **Dashboard.jsx** actúa como el panel de control para los usuarios autenticados. Después de iniciar sesión, los usuarios pueden acceder a las funciones de gestión de servicios, ver los servicios que han ofrecido y administrar su cuenta.
+El **Dashboard** es la pantalla principal de la aplicación donde los usuarios pueden visualizar, crear, actualizar y solicitar servicios. 
 
-#### Funcionalidad:
-- **Verificación de Autenticación**: Asegura que solo los usuarios autenticados puedan acceder al dashboard. Si no hay un token de acceso en el `localStorage`, el usuario es redirigido al inicio de sesión.
-- **Listado de Servicios**: Muestra los servicios que el usuario ha creado o gestionado. Permite interactuar con estos servicios (ver detalles, editar o eliminar).
-- **Navegación**: Proporciona un acceso rápido a otras funcionalidades, como agregar un nuevo servicio o actualizar el perfil.
+### Funcionalidades principales:
+
+- **Visualización de servicios**: Se muestra una lista de servicios publicados por los usuarios con detalles como título, descripción, duración estimada, disponibilidad horaria, categoría y el nombre del oferente.
+- **Publicación de un servicio**: Los usuarios pueden publicar un nuevo servicio haciendo clic en el botón `Ofrecer Servicio`, lo que abre un formulario de creación.
+- **Actualización de un servicio**: Los usuarios pueden actualizar los servicios que han publicado a través del botón `Actualizar`.
+- **Eliminación de un servicio**: Si el usuario es el oferente del servicio, puede eliminarlo utilizando el botón `Borrar`.
+- **Solicitud de servicio**: Si un usuario desea solicitar un servicio publicado por otra persona, puede hacerlo haciendo clic en el botón `Solicitar`, donde se le pedirá que agregue un comentario antes de confirmar la solicitud.
+
+### Navegación:
+
+El Dashboard cuenta con un **navbar** que permite acceder a las siguientes secciones:
+
+- **Perfil**: Permite al usuario ver y modificar su información personal.
+- **Mis Solicitudes**: Muestra las solicitudes enviadas por el usuario y su estado.
+- **Salir**: Cierra sesión, eliminando los tokens de autenticación almacenados.
+
+### Confirmaciones y Modales:
+
+- **Confirmación de eliminación**: Antes de eliminar un servicio, se muestra un modal de confirmación.
+- **Confirmación de solicitud**: Al solicitar un servicio, se muestra un modal para ingresar un comentario antes de enviar la solicitud.
 
 ---
 
@@ -96,10 +112,41 @@ El componente **ServiceDelete.jsx** permite a los usuarios eliminar un servicio 
 - **Notificación y Cierre**: Después de eliminar el servicio, notifica al componente padre que el servicio ha sido eliminado y cierra el formulario.
 
 ---
+### 9. Componente `ServiceRequestModal`
 
-## Autenticación y Seguridad
+El componente `ServiceRequestModal` es un modal de React utilizado para que los usuarios puedan escribir y enviar una solicitud de servicio agregando un comentario.
+
+### Funcionalidad:
+
+- **Entrada de texto**: Permite al usuario escribir un comentario sobre la solicitud a través de un `textarea`.
+- **Confirmación de solicitud**: Incluye un botón `Enviar` que ejecuta la función `confirmRequest` cuando el usuario confirma la solicitud.
+- **Cierre del modal**: Dispone de un botón `Cancelar` que activa la función `onClose` para cerrar el modal sin enviar la solicitud.
 
 ---
+
+### 10. **RequestPage.jsx**
+
+El componente **RequestsPage.jsx** permite a los usuarios ver las solicitudes recibidas para los servicios que han publicado. Desde esta página, pueden aceptar o rechazar solicitudes según su disponibilidad.
+
+#### Funcionalidad:
+- **Carga de Solicitudes**: Obtiene las solicitudes relacionadas con los servicios publicados por el usuario autenticado.
+- **Enriquecimiento de Datos**: Recupera información adicional como el nombre del solicitante y el título del servicio.
+- **Gestión de Estado**: Permite actualizar el estado de una solicitud a aceptada o rechazada mediante una solicitud PATCH a la API.
+- **Interfaz Interactiva**: Muestra las solicitudes con un diseño claro e intuitivo, permitiendo a los usuarios gestionar fácilmente sus peticiones.
+
+---
+### 11. Filtros de Búsqueda
+
+El Dashboard permite filtrar los servicios por **título** y **categoría**. Esto facilita a los usuarios encontrar los servicios que buscan de manera más eficiente.
+
+### Implementación
+
+Se utilizan dos estados en React para almacenar los filtros:
+- `filterTitle`: Para el título del servicio.
+- `filterCategory`: Para la categoría del servicio.
+
+---
+## Autenticación y Seguridad
 
 La autenticación es gestionada a través de tokens JWT. Los componentes que requieren autenticación, como el **Dashboard.jsx**, **Profile.jsx**, y la gestión de servicios, comprueban la existencia de un `accessToken` en el `localStorage` antes de permitir al usuario realizar cualquier acción. Los tokens son almacenados durante la sesión y se utilizan en las solicitudes a la API para garantizar que las acciones del usuario estén autorizadas.
 
