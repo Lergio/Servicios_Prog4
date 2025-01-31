@@ -21,7 +21,7 @@ const Register = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://181.199.159.26:8080/api/auth/register/', formData);
+      const response = await axios.post('http://181.199.159.26:8010/api/auth/register/', formData);
       const { access, refresh } = response.data;
       localStorage.setItem('accessToken', access);
       localStorage.setItem('refreshToken', refresh);
